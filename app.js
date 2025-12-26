@@ -105,12 +105,34 @@ function byOrder(a, b) {
   return safeText(a.name ?? a.title ?? "").localeCompare(safeText(b.name ?? b.title ?? ""));
 }
 
-function fmtDateParts(iso) {
-  const s = safeText(iso);
-  const d = new Date(s + "T12:00:00");
+function fmtDateParts(value) {
+  const s = safeText(value);
+  if (!s) return null;
+
+  let d;
+
+  // ISO format: YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    d = new Date(s + "T12:00:00");
+  }
+  // US format: M/D/YYYY or MM/DD/YYYY
+  else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [m, day, y] = s.split("/").map(Number);
+    d = new Date(y, m - 1, day, 12, 0, 0);
+  }
+  // Fallback (let browser try)
+  else {
+    d = new Date(s);
+  }
+
   if (Number.isNaN(d.getTime())) return null;
-  const m = d.toLocaleString("en-US", { month: "short" });
-  return { m, day: d.getDate(), y: d.getFullYear(), date: d };
+
+  return {
+    m: d.toLocaleString("en-US", { month: "short" }),
+    day: d.getDate(),
+    y: d.getFullYear(),
+    date: d
+  };
 }
 
 // ---------- routing ----------
