@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stroud Youth Wrestling Club</title>
+  <meta name="description" content="Stroud Youth Wrestling Club — announcements, schedule, roster, fundraisers, medal hall, coaches, sponsors." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="#/announcements" aria-label="Go to announcements">
+        <img class="brand__logo" src="logo.png" alt="Stroud Youth Wrestling Club Tiger Logo" />
+        <div class="brand__text">
+          <div class="brand__title">Stroud Youth Wrestling Club</div>
+          <div class="brand__tag">Competitive. Organized. Cutting edge.</div>
+        </div>
+      </a>
+
+      <button id="menuBtn" class="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+
+      <!-- NAV ORDER: Announcements, Schedule, Roster, Fundraisers, Medal Hall, Coaches, Sponsors -->
+      <nav class="nav" id="nav">
+        <a href="#/announcements" data-route="announcements">Announcements</a>
+        <a href="#/schedule" data-route="schedule">Schedule</a>
+        <a href="#/roster" data-route="roster">Roster</a>
+        <a href="#/fundraisers" data-route="fundraisers">Fundraisers</a>
+        <a href="#/medal-hall" data-route="medal-hall">Medal Hall</a>
+        <a href="#/coaches" data-route="coaches">Coaches</a>
+        <a href="#/sponsors" data-route="sponsors">Sponsors</a>
+      </nav>
+    </div>
+    <div class="topbar__accent"></div>
+  </header>
+
+  <main class="main">
+    <section class="page page--active" data-page="announcements">
+      <div class="pageHead">
+        <h2>Announcements</h2>
+        <p class="muted">Latest updates from the club.</p>
+      </div>
+      <div id="announcementsWrap" class="stack"></div>
+      <div id="announcementsEmpty" class="empty hidden">No announcements yet.</div>
+    </section>
+
+    <section class="page" data-page="schedule">
+      <div class="pageHead">
+        <h2>Schedule</h2>
+        <p class="muted">Tournaments, duals, practices — all in one place.</p>
+      </div>
+      <div id="scheduleList" class="list"></div>
+      <div id="scheduleEmpty" class="empty hidden">No events yet.</div>
+    </section>
+
+    <section class="page" data-page="roster">
+      <div class="pageHead">
+        <h2>Roster</h2>
+        <p class="muted">Tap a wrestler to open their Flo profile.</p>
+        <div class="filters">
+          <input id="rosterSearch" class="input" placeholder="Search name or nickname…" />
+          <select id="divisionFilter" class="input"></select>
+          <select id="weightFilter" class="input"></select>
+        </div>
+      </div>
+      <div id="rosterGrid" class="grid"></div>
+      <div id="rosterEmpty" class="empty hidden">No wrestlers match your filters.</div>
+    </section>
+
+    <section class="page" data-page="fundraisers">
+      <div class="pageHead">
+        <h2>Fundraisers</h2>
+        <p class="muted">Help support the club.</p>
+      </div>
+      <div id="fundraisersGrid" class="grid grid--cards"></div>
+      <div id="fundraisersEmpty" class="empty hidden">No fundraisers listed.</div>
+    </section>
+
+    <section class="page" data-page="medal-hall">
+      <div class="pageHead">
+        <h2>Medal Hall</h2>
+        <p class="muted">Recent medalists and podium finishes.</p>
+      </div>
+      <div id="medalGrid" class="grid grid--cards"></div>
+      <div id="medalEmpty" class="empty hidden">No medal hall entries yet.</div>
+    </section>
+
+    <section class="page" data-page="coaches">
+      <div class="pageHead">
+        <h2>Meet the Coaches</h2>
+        <p class="muted">The people building the program.</p>
+      </div>
+      <div id="coachesGrid" class="grid grid--cards"></div>
+      <div id="coachesEmpty" class="empty hidden">No coaches listed.</div>
+    </section>
+
+    <section class="page" data-page="sponsors">
+      <div class="pageHead">
+        <h2>Sponsors</h2>
+        <p class="muted">Thank you to the businesses supporting SYWC.</p>
+      </div>
+      <div id="sponsorsGrid" class="grid grid--sponsors"></div>
+      <div id="sponsorsEmpty" class="empty hidden">No sponsors listed yet.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <div>© <span id="year"></span> Stroud Youth Wrestling Club</div>
+      <div class="footer__small muted">Updated from our team sheet • Built for speed</div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
