@@ -90,6 +90,7 @@ async function fetchTab(tabName) {
 
 function normalizeRows(rows) {
   return rows
+    // if column is missing, default visible=true
     .filter(r => toBool(r.visible ?? true))
     .map(r => {
       const obj = {};
@@ -135,35 +136,28 @@ function fmtDateParts(value) {
   };
 }
 
-// ---------- routing ----------
-const pages = qsa(".page");
-
-function setActivePage(key) {
-  pages.forEach(p => p.classList.toggle("page--active", p.dataset.page === key));
-  qsa(".nav a").forEach(a => a.classList.toggle("active", a.dataset.route === key));
-
-  // close mobile nav
-  const nav = qs("#nav");
-  nav.classList.remove("open");
-  qs("#menuBtn").setAttribute("aria-expanded", "false");
+function isBlankish(v) {
+  const s = safeText(v).toLowerCase();
+  return !s || s === "na" || s === "n/a" || s === "none";
 }
 
-function routeFromHash() {
-  const hash = location.hash.replace("#/", "").replace("#", "");
-  return hash || "announcements"; // default is announcements
-}
-
-window.addEventListener("hashchange", () => setActivePage(routeFromHash()));
-
-// mobile menu
+// ---------- mobile menu ----------
 (() => {
   const btn = qs("#menuBtn");
   const nav = qs("#nav");
+  if (!btn || !nav) return;
+
   btn.addEventListener("click", () => {
     const open = !nav.classList.contains("open");
     nav.classList.toggle("open", open);
     btn.setAttribute("aria-expanded", String(open));
   });
+
+  // Close nav after clicking a link (mobile)
+  qsa("#nav a").forEach(a => a.addEventListener("click", () => {
+    nav.classList.remove("open");
+    btn.setAttribute("aria-expanded", "false");
+  }));
 })();
 
 // ---------- render: announcements ----------
@@ -189,20 +183,24 @@ function renderAnnouncements(rows) {
     const ctaLabel = safeText(r.cta_label);
     const ctaUrl = safeText(r.cta_url);
 
-    const cta = (ctaLabel && ctaUrl)
-      ? `<div style="margin-top:12px">
-          <a class="btn btn--primary" href="${escapeAttr(ctaUrl)}" target="_blank" rel="noopener">
-            ${escapeHtml(ctaLabel)}
-          </a>
-        </div>`
-      : "";
+    const dateLine = dp ? `${escapeHtml(dp.m)} ${dp.day}, ${dp.y}` : "";
 
     return `
       <div class="announce ${pinned ? "announce--pinned" : ""}">
-        <div class="announce__title">${escapeHtml(title)}</div>
-        <div class="announce__date">${dp ? `${escapeHtml(dp.m)} ${dp.day}, ${dp.y}` : ""}</div>
-        <div class="announce__msg">${escapeHtml(msg)}</div>
-        ${cta}
+        <div class="announceRow">
+          <div class="announceMain">
+            <div class="announce__title">${escapeHtml(title)}</div>
+            ${dateLine ? `<div class="announce__date announce__date--big">${dateLine}</div>` : ""}
+            <div class="announce__msg">${escapeHtml(msg)}</div>
+          </div>
+
+          ${(ctaLabel && ctaUrl) ? `
+            <div class="announceCTA">
+              <a class="btn btn--primary btn--big" href="${escapeAttr(ctaUrl)}" target="_blank" rel="noopener">
+                ${escapeHtml(ctaLabel)}
+              </a>
+            </div>` : ""}
+        </div>
       </div>
     `;
   });
@@ -238,15 +236,17 @@ function renderSchedule(rows) {
     const notes = safeText(r.notes);
     const link = safeText(r.link_url);
 
-    const metaParts = [
-      loc,
-      type && `• ${type}`,
-      weigh && `• Weigh-in: ${weigh}`,
-      start && `• Start: ${start}`,
-    ].filter(Boolean).join(" ");
+    // Big title: TYPE (Practice/Tournament/Dual/etc). Fallback: name.
+    const topTitle = !isBlankish(type) ? type : name;
+    const subTitle = (!isBlankish(type) && !isBlankish(name)) ? name : "";
+
+    const metaBits = [];
+    if (!isBlankish(loc)) metaBits.push(loc);
+    if (!isBlankish(weigh)) metaBits.push(`Weigh-in: ${weigh}`);
+    if (!isBlankish(start)) metaBits.push(`Start: ${start}`);
 
     const right = link
-      ? `<a class="btn btn--ghost" href="${escapeAttr(link)}" target="_blank" rel="noopener">Details</a>`
+      ? `<a class="btn btn--primary" href="${escapeAttr(link)}" target="_blank" rel="noopener">Details</a>`
       : "";
 
     return `
@@ -257,9 +257,10 @@ function renderSchedule(rows) {
             <div class="d">${dp ? dp.day : "—"}</div>
             <div class="y">${dp ? dp.y : ""}</div>
           </div>
-          <div>
-            <div class="row__title">${escapeHtml(name)}</div>
-            <div class="row__meta">${escapeHtml(metaParts)}</div>
+          <div class="row__content">
+            <div class="row__title row__title--big">${escapeHtml(topTitle)}</div>
+            ${subTitle ? `<div class="row__meta">${escapeHtml(subTitle)}</div>` : ""}
+            ${metaBits.length ? `<div class="row__meta">${escapeHtml(metaBits.join(" • "))}</div>` : ""}
             ${notes ? `<div class="row__note">${escapeHtml(notes)}</div>` : ""}
           </div>
         </div>
@@ -296,15 +297,30 @@ function renderRoster(rows) {
     const img = safeText(r.photo_url);
     const flo = safeText(r.flo_url);
 
+    // OPTIONAL STATS: wins, losses, pins, points (show only if provided)
+    const wins = safeText(r.wins);
+    const losses = safeText(r.losses);
+    const pins = safeText(r.pins);
+    const points = safeText(r.points);
+
+    const statChips = [];
+    if (wins || losses) statChips.push(`<span class="chip">W-L: ${escapeHtml(wins || "0")}-${escapeHtml(losses || "0")}</span>`);
+    if (pins) statChips.push(`<span class="chip">Pins: ${escapeHtml(pins)}</span>`);
+    if (points) statChips.push(`<span class="chip">Pts: ${escapeHtml(points)}</span>`);
+
     const chips = [
       div ? `<span class="chip chip--blue">${escapeHtml(div)}</span>` : "",
       wt ? `<span class="chip">${escapeHtml(wt)}</span>` : "",
+      ...statChips
     ].filter(Boolean).join("");
 
     const sub = nick ? `“${escapeHtml(nick)}”` : `<span class="muted"> </span>`;
 
+    // If no Flo URL, don't make it a dead link
+    const href = flo ? escapeAttr(flo) : "javascript:void(0)";
+
     return `
-      <a class="card" href="${escapeAttr(flo || "#")}" target="_blank" rel="noopener">
+      <a class="card" href="${href}" ${flo ? `target="_blank" rel="noopener"` : ""}>
         <img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" />
         <div class="card__body">
           <div class="card__title">${escapeHtml(name)}</div>
@@ -321,13 +337,13 @@ function renderRoster(rows) {
     const wtSel = safeText(weight.value);
 
     const filtered = rows.filter(r => {
-      const name = safeText(r.name).toLowerCase();
-      const nick = safeText(r.nickname).toLowerCase();
-      const div = safeText(r.division);
+      const nm = safeText(r.name).toLowerCase();
+      const nk = safeText(r.nickname).toLowerCase();
+      const dv = safeText(r.division);
       const wt = safeText(r.weight_class);
 
-      const termOk = !term || name.includes(term) || nick.includes(term);
-      const divOk = (divSel === "All Divisions") || div === divSel;
+      const termOk = !term || nm.includes(term) || nk.includes(term);
+      const divOk = (divSel === "All Divisions") || dv === divSel;
       const wtOk = (wtSel === "All Weights") || wt === wtSel;
       return termOk && divOk && wtOk;
     }).sort(byOrder);
@@ -498,8 +514,7 @@ function renderSponsors(rows) {
 async function init() {
   qs("#year").textContent = String(new Date().getFullYear());
 
-  // set initial route (defaults to announcements)
-  setActivePage(routeFromHash());
+  // ✅ CONTINUOUS PAGE: no routing, no hash routes, no page toggling
 
   try {
     const [
