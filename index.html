@@ -10,32 +10,40 @@
 <body>
   <header class="topbar">
     <div class="topbar__inner">
-      <a class="brand" href="#/announcements" aria-label="Go to announcements">
-        <img class="brand__logo" src="logo.png" alt="Stroud Youth Wrestling Club Tiger Logo" />
+      <!-- Brand now jumps to the Announcements section (top of page) -->
+      <a class="brand" href="#announcements" aria-label="Go to announcements">
+        <!-- ✅ Use images folder -->
+        <img class="brand__logo" src="images/logo.png" alt="Stroud Youth Wrestling Club Tiger Logo" />
         <div class="brand__text">
           <div class="brand__title">Stroud Youth Wrestling Club</div>
-          <div class="brand__tag">#Workdontwish!    ---> menu button</div>
+          <!-- Removed the manual arrow text -->
+          <div class="brand__tag">#Workdontwish!</div>
         </div>
       </a>
 
+      <!-- Menu button stays for small screens -->
       <button id="menuBtn" class="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+      <!-- Hint text for folded/phone view -->
+      <span class="menuHint" id="menuHint">Menu →</span>
 
       <!-- NAV ORDER: Announcements, Schedule, Roster, Fundraisers, Medal Hall, Coaches, Sponsors -->
+      <!-- ✅ Anchors now jump to sections (continuous scroll) -->
       <nav class="nav" id="nav">
-        <a href="#/announcements" data-route="announcements">Announcements</a>
-        <a href="#/schedule" data-route="schedule">Schedule</a>
-        <a href="#/roster" data-route="roster">Roster</a>
-        <a href="#/fundraisers" data-route="fundraisers">Fundraisers</a>
-        <a href="#/medal-hall" data-route="medal-hall">Medal Hall</a>
-        <a href="#/coaches" data-route="coaches">Coaches</a>
-        <a href="#/sponsors" data-route="sponsors">Sponsors</a>
+        <a href="#announcements">Announcements</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#roster">Roster</a>
+        <a href="#fundraisers">Fundraisers</a>
+        <a href="#medal-hall">Medal Hall</a>
+        <a href="#coaches">Coaches</a>
+        <a href="#sponsors">Sponsors</a>
       </nav>
     </div>
     <div class="topbar__accent"></div>
   </header>
 
   <main class="main">
-    <section class="page page--active" data-page="announcements">
+    <!-- ✅ IDs added so nav anchors work -->
+    <section class="page" id="announcements" data-page="announcements">
       <div class="pageHead">
         <h2>Announcements</h2>
         <p class="muted">Latest updates from the club.</p>
@@ -44,7 +52,7 @@
       <div id="announcementsEmpty" class="empty hidden">No announcements yet.</div>
     </section>
 
-    <section class="page" data-page="schedule">
+    <section class="page" id="schedule" data-page="schedule">
       <div class="pageHead">
         <h2>Schedule</h2>
         <p class="muted">Tournaments, duals, practices — all in one place.</p>
@@ -53,7 +61,7 @@
       <div id="scheduleEmpty" class="empty hidden">No events yet.</div>
     </section>
 
-    <section class="page" data-page="roster">
+    <section class="page" id="roster" data-page="roster">
       <div class="pageHead">
         <h2>Roster</h2>
         <p class="muted">Tap a wrestler to open their Flo profile.</p>
@@ -67,7 +75,7 @@
       <div id="rosterEmpty" class="empty hidden">No wrestlers match your filters.</div>
     </section>
 
-    <section class="page" data-page="fundraisers">
+    <section class="page" id="fundraisers" data-page="fundraisers">
       <div class="pageHead">
         <h2>Fundraisers</h2>
         <p class="muted">Help support the club.</p>
@@ -76,7 +84,7 @@
       <div id="fundraisersEmpty" class="empty hidden">No fundraisers listed.</div>
     </section>
 
-    <section class="page" data-page="medal-hall">
+    <section class="page" id="medal-hall" data-page="medal-hall">
       <div class="pageHead">
         <h2>Medal Hall</h2>
         <p class="muted">Recent medalists and podium finishes.</p>
@@ -85,7 +93,7 @@
       <div id="medalEmpty" class="empty hidden">No medal hall entries yet.</div>
     </section>
 
-    <section class="page" data-page="coaches">
+    <section class="page" id="coaches" data-page="coaches">
       <div class="pageHead">
         <h2>Meet the Coaches</h2>
         <p class="muted">The people building the program.</p>
@@ -94,7 +102,7 @@
       <div id="coachesEmpty" class="empty hidden">No coaches listed.</div>
     </section>
 
-    <section class="page" data-page="sponsors">
+    <section class="page" id="sponsors" data-page="sponsors">
       <div class="pageHead">
         <h2>Sponsors</h2>
         <p class="muted">Thank you to the businesses supporting SYWC.</p>
