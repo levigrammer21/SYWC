@@ -225,9 +225,9 @@ const btnLabel = cleanCell(r.details_label);
             </div>
           </div>
           ${
-            !isBlank(link)
-              ? `<a class="btn btn--primary" href="${escapeAttr(link)}" target="_blank" rel="noopener">${escapeHtml(btnLabel)}</a>`
-              : ""
+  !isBlank(link) && !isBlank(btnLabel)
+    ? `<a class="btn btn--primary" href="${escapeAttr(link)}" target="_blank" rel="noopener">${escapeHtml(btnLabel)}</a>`
+    : ""
           }
         </div>`;
     })
