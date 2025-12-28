@@ -1,4 +1,4 @@
-// ================== SYWC Sheet-Driven Site (STABLE) ==================
+// ================== SYWC Sheet-Driven Site (STABLE + FIXES) ==================
 
 const SHEET_ID = "1dPPX4OQeafjlVBu1pRi-n98hTCbM0BsQRFQJbEcCEUw";
 
@@ -14,23 +14,30 @@ const TABS = {
 
 // ---------- DOM helpers ----------
 const qs = (s, r = document) => r.querySelector(s);
-const qsa = (s, r = document) => [...r.querySelectorAll(s)];
-const show = (el) => el && el.classList.remove("hidden");
-const hide = (el) => el && el.classList.add("hidden");
 
 // ---------- value helpers ----------
-const clean = (v) => String(v ?? "").trim();
+const raw = (v) => String(v ?? "");
 
-const isBlank = (v) => {
-  const s = clean(v).toLowerCase();
-  return !s || s === "na" || s === "n/a" || s === "none";
-};
+// Strong “cell cleaning” (handles gviz CSV weirdness)
+function cleanCell(v) {
+  return raw(v)
+    .replaceAll("\u00A0", " ")
+    .trim()
+    .replace(/^"+|"+$/g, "") // remove wrapping quotes
+    .trim();
+}
 
-const toBool = (v) => ["true", "yes", "1", "y"].includes(clean(v).toLowerCase());
+// Treat these as empty
+function isBlank(v) {
+  const s = cleanCell(v).toLowerCase();
+  return !s || s === "na" || s === "n/a" || s === "none" || s === '""' || s === '"';
+}
 
-// Safe HTML (prevents accidental breaks)
+const toBool = (v) => ["true", "yes", "1", "y"].includes(cleanCell(v).toLowerCase());
+
+// Safe HTML
 const escapeHtml = (str) =>
-  String(str ?? "")
+  raw(str)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -41,35 +48,21 @@ const escapeAttr = (str) => escapeHtml(str).replaceAll("`", "&#096;");
 
 // ---------- sheet fetching ----------
 function csvUrl(tab) {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(
-    tab
-  )}`;
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
 }
 
 function parseCSV(text) {
   const rows = [];
-  let cur = "",
-    inQuotes = false,
-    row = [];
+  let cur = "", inQuotes = false, row = [];
 
   for (let i = 0; i < text.length; i++) {
-    const c = text[i],
-      n = text[i + 1];
+    const c = text[i], n = text[i + 1];
 
-    if (c === '"' && n === '"') {
-      cur += '"';
-      i++;
-      continue;
-    }
-    if (c === '"') {
-      inQuotes = !inQuotes;
-      continue;
-    }
-    if (!inQuotes && c === ",") {
-      row.push(cur);
-      cur = "";
-      continue;
-    }
+    if (c === '"' && n === '"') { cur += '"'; i++; continue; }
+    if (c === '"') { inQuotes = !inQuotes; continue; }
+
+    if (!inQuotes && c === ",") { row.push(cur); cur = ""; continue; }
+
     if (!inQuotes && (c === "\n" || c === "\r")) {
       if (c === "\r" && n === "\n") i++;
       row.push(cur);
@@ -78,19 +71,18 @@ function parseCSV(text) {
       cur = "";
       continue;
     }
+
     cur += c;
   }
-  if (cur || row.length) {
-    row.push(cur);
-    rows.push(row);
-  }
 
+  if (cur || row.length) { row.push(cur); rows.push(row); }
   if (!rows.length) return [];
-  const headers = rows.shift().map((h) => clean(h));
+
+  const headers = rows.shift().map((h) => cleanCell(h));
 
   return rows.map((r) => {
     const o = {};
-    headers.forEach((h, i) => (o[h] = clean(r[i])));
+    headers.forEach((h, i) => (o[h] = cleanCell(r[i])));
     return o;
   });
 }
@@ -105,16 +97,20 @@ async function loadTab(tab) {
 // ---------- date helper ----------
 function fmtDate(v) {
   if (isBlank(v)) return null;
+  const s = cleanCell(v);
   let d;
 
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v)) {
-    const [m, day, y] = v.split("/").map(Number);
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [m, day, y] = s.split("/").map(Number);
     d = new Date(y, m - 1, day, 12);
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    d = new Date(s + "T12:00:00");
   } else {
-    d = new Date(v);
+    d = new Date(s);
   }
 
-  if (isNaN(d)) return null;
+  if (Number.isNaN(d.getTime())) return null;
+
   return {
     m: d.toLocaleString("en-US", { month: "short" }),
     d: d.getDate(),
@@ -125,25 +121,13 @@ function fmtDate(v) {
 
 // ---------- image path helper ----------
 function normalizeImageUrl(url) {
-  const u = clean(url);
+  const u = cleanCell(url);
   if (isBlank(u)) return "";
+
   if (/^(https?:\/\/|data:)/i.test(u)) return u;
-  if (u.startsWith("images/")) return `./${u}`; // GitHub Pages safe
+  if (u.startsWith("images/")) return `./${u}`;
+  if (u.startsWith("/")) return u;
   return u;
-}
-
-// supports "photo_url" OR "photo_urls" (comma separated)
-function getPhotoList(row) {
-  const one = clean(row.photo_url);
-  const many = clean(row.photo_urls);
-
-  const raw = !isBlank(many) ? many : one;
-  if (isBlank(raw)) return [];
-
-  return raw
-    .split(",")
-    .map((s) => normalizeImageUrl(s))
-    .filter((s) => !isBlank(s));
 }
 
 /* ================= ANNOUNCEMENTS ================= */
@@ -154,40 +138,46 @@ function renderAnnouncements(rows) {
 
   wrap.innerHTML = "";
 
-  rows
-    .slice()
-    .sort((a, b) => toBool(b.pin_to_top) - toBool(a.pin_to_top))
-    .forEach((r) => {
+  const sorted = rows.slice().sort((a, b) => {
+    const ap = toBool(a.pin_to_top);
+    const bp = toBool(b.pin_to_top);
+    if (ap !== bp) return ap ? -1 : 1;
+    const da = fmtDate(a.date)?.date?.getTime() ?? 0;
+    const db = fmtDate(b.date)?.date?.getTime() ?? 0;
+    return db - da;
+  });
+
+  wrap.innerHTML = sorted
+    .map((r) => {
       const d = fmtDate(r.date);
-      wrap.innerHTML += `
+      const title = cleanCell(r.title);
+      const msg = cleanCell(r.message);
+      const ctaLabel = cleanCell(r.cta_label);
+      const ctaUrl = cleanCell(r.cta_url);
+
+      return `
         <div class="announce ${toBool(r.pin_to_top) ? "announce--pinned" : ""}">
           <div class="announceRow">
-            <div class="announceMain">
-              <div class="announce__title">${escapeHtml(r.title)}</div>
+            <div>
+              <div class="announce__title">${escapeHtml(title)}</div>
               ${
                 d
-                  ? `<div class="announce__date announce__date--big">${escapeHtml(
-                      `${d.m} ${d.d}, ${d.y}`
-                    )}</div>`
+                  ? `<div class="announce__date announce__date--big">${escapeHtml(`${d.m} ${d.d}, ${d.y}`)}</div>`
                   : ""
               }
-              <div class="announce__msg">${escapeHtml(r.message)}</div>
+              ${!isBlank(msg) ? `<div class="announce__msg">${escapeHtml(msg)}</div>` : ""}
             </div>
-
             ${
-              !isBlank(r.cta_label) && !isBlank(r.cta_url)
-                ? `<div class="announceCTA">
-                    <a class="btn btn--primary btn--big" href="${escapeAttr(
-                      r.cta_url
-                    )}" target="_blank" rel="noopener">${escapeHtml(r.cta_label)}</a>
-                  </div>`
+              !isBlank(ctaLabel) && !isBlank(ctaUrl)
+                ? `<a class="btn btn--primary btn--big" href="${escapeAttr(ctaUrl)}" target="_blank" rel="noopener">${escapeHtml(ctaLabel)}</a>`
                 : ""
             }
           </div>
         </div>`;
-    });
+    })
+    .join("");
 
-  if (empty) (rows.length ? hide(empty) : show(empty));
+  if (empty) empty.classList.toggle("hidden", sorted.length > 0);
 }
 
 /* ================= SCHEDULE ================= */
@@ -198,19 +188,29 @@ function renderSchedule(rows) {
 
   list.innerHTML = "";
 
-  rows
-    .slice()
-    .sort((a, b) => (fmtDate(a.date)?.date ?? 0) - (fmtDate(b.date)?.date ?? 0))
-    .forEach((r) => {
+  const sorted = rows.slice().sort((a, b) => {
+    const da = fmtDate(a.date)?.date?.getTime() ?? 0;
+    const db = fmtDate(b.date)?.date?.getTime() ?? 0;
+    return da - db;
+  });
+
+  list.innerHTML = sorted
+    .map((r) => {
       const d = fmtDate(r.date);
-      const title = !isBlank(r.type) ? r.type : r.name;
+      const type = cleanCell(r.type);
+      const name = cleanCell(r.name);
+      const title = !isBlank(type) ? type : name;
 
       const meta = [];
-      if (!isBlank(r.location)) meta.push(r.location);
-      if (!isBlank(r.start_time)) meta.push(`Start: ${r.start_time}`);
-      if (!isBlank(r.weigh_in_time)) meta.push(`Weigh-in: ${r.weigh_in_time}`);
+      if (!isBlank(r.location)) meta.push(cleanCell(r.location));
+      if (!isBlank(r.start_time)) meta.push(`Start: ${cleanCell(r.start_time)}`);
+      if (!isBlank(r.weigh_in_time)) meta.push(`Weigh-in: ${cleanCell(r.weigh_in_time)}`);
 
-      list.innerHTML += `
+      const notes = cleanCell(r.notes);
+      const link = cleanCell(r.link_url);
+      const btnLabel = !isBlank(r.details_label) ? cleanCell(r.details_label) : "Details";
+
+      return `
         <div class="row">
           <div class="row__left">
             <div class="dateBox">
@@ -221,38 +221,22 @@ function renderSchedule(rows) {
             <div class="row__content">
               <div class="row__title row__title--big">${escapeHtml(title)}</div>
               ${meta.length ? `<div class="row__meta">${escapeHtml(meta.join(" • "))}</div>` : ""}
-              ${!isBlank(r.notes) ? `<div class="row__note">${escapeHtml(r.notes)}</div>` : ""}
+              ${!isBlank(notes) ? `<div class="row__note">${escapeHtml(notes)}</div>` : ""}
             </div>
           </div>
-
           ${
-            !isBlank(r.link_url)
-              ? `<a class="btn btn--primary" href="${escapeAttr(
-                  r.link_url
-                )}" target="_blank" rel="noopener">${escapeHtml(r.details_label || "Details")}</a>`
+            !isBlank(link)
+              ? `<a class="btn btn--primary" href="${escapeAttr(link)}" target="_blank" rel="noopener">${escapeHtml(btnLabel)}</a>`
               : ""
           }
         </div>`;
-    });
+    })
+    .join("");
 
-  if (empty) (rows.length ? hide(empty) : show(empty));
+  if (empty) empty.classList.toggle("hidden", sorted.length > 0);
 }
 
 /* ================= ROSTER ================= */
-let _rosterAll = [];
-
-function buildRosterFilters(rows) {
-  const divisionSel = qs("#divisionFilter");
-  const weightSel = qs("#weightFilter");
-  if (!divisionSel || !weightSel) return;
-
-  const divisions = [...new Set(rows.map((r) => clean(r.division)).filter((v) => !isBlank(v)))].sort();
-  const weights = [...new Set(rows.map((r) => clean(r.weight_class)).filter((v) => !isBlank(v)))].sort();
-
-  divisionSel.innerHTML = `<option value="">All divisions</option>` + divisions.map(d => `<option value="${escapeAttr(d)}">${escapeHtml(d)}</option>`).join("");
-  weightSel.innerHTML = `<option value="">All weights</option>` + weights.map(w => `<option value="${escapeAttr(w)}">${escapeHtml(w)}</option>`).join("");
-}
-
 function renderRoster(rows) {
   const grid = qs("#rosterGrid");
   const empty = qs("#rosterEmpty");
@@ -260,47 +244,39 @@ function renderRoster(rows) {
 
   grid.innerHTML = "";
 
-  rows.forEach((r) => {
-    const stats = [];
-    if (!isBlank(r.wins) || !isBlank(r.losses)) stats.push(`W-L ${r.wins || 0}-${r.losses || 0}`);
-    if (!isBlank(r.pins)) stats.push(`Pins ${r.pins}`);
-    if (!isBlank(r.points)) stats.push(`Pts ${r.points}`);
+  grid.innerHTML = rows
+    .map((r) => {
+      const name = cleanCell(r.name);
+      const nick = cleanCell(r.nickname);
+      const div = cleanCell(r.division);
+      const wt = cleanCell(r.weight_class);
+      const img = normalizeImageUrl(r.photo_url);
+      const flo = cleanCell(r.flo_url);
 
-    const img = normalizeImageUrl(r.photo_url);
+      const stats = [];
+      if (!isBlank(r.wins) || !isBlank(r.losses)) stats.push(`W-L ${cleanCell(r.wins || 0)}-${cleanCell(r.losses || 0)}`);
+      if (!isBlank(r.pins)) stats.push(`Pins ${cleanCell(r.pins)}`);
+      if (!isBlank(r.points)) stats.push(`Pts ${cleanCell(r.points)}`);
 
-    grid.innerHTML += `
-      <a class="card" ${!isBlank(r.flo_url) ? `href="${escapeAttr(r.flo_url)}" target="_blank" rel="noopener"` : ""}>
-        <img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(r.name)}" loading="lazy" />
-        <div class="card__body">
-          <div class="card__title">${escapeHtml(r.name)}</div>
-          ${r.nickname ? `<div class="card__sub">"${escapeHtml(r.nickname)}"</div>` : ""}
-          <div class="chips">
-            ${r.division ? `<span class="chip chip--blue">${escapeHtml(r.division)}</span>` : ""}
-            ${r.weight_class ? `<span class="chip">${escapeHtml(r.weight_class)}</span>` : ""}
-            ${stats.map((s) => `<span class="chip">${escapeHtml(s)}</span>`).join("")}
+      const href = !isBlank(flo) ? `href="${escapeAttr(flo)}" target="_blank" rel="noopener"` : "";
+
+      return `
+        <a class="card" ${href}>
+          <img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" />
+          <div class="card__body">
+            <div class="card__title">${escapeHtml(name)}</div>
+            ${!isBlank(nick) ? `<div class="card__sub">"${escapeHtml(nick)}"</div>` : ""}
+            <div class="chips">
+              ${!isBlank(div) ? `<span class="chip chip--blue">${escapeHtml(div)}</span>` : ""}
+              ${!isBlank(wt) ? `<span class="chip">${escapeHtml(wt)}</span>` : ""}
+              ${stats.map((s) => `<span class="chip">${escapeHtml(s)}</span>`).join("")}
+            </div>
           </div>
-        </div>
-      </a>`;
-  });
+        </a>`;
+    })
+    .join("");
 
-  if (empty) (rows.length ? hide(empty) : show(empty));
-}
-
-function applyRosterFilters() {
-  const search = clean(qs("#rosterSearch")?.value).toLowerCase();
-  const div = clean(qs("#divisionFilter")?.value);
-  const wt = clean(qs("#weightFilter")?.value);
-
-  const filtered = _rosterAll.filter((r) => {
-    const name = clean(r.name).toLowerCase();
-    const nick = clean(r.nickname).toLowerCase();
-    const matchesSearch = !search || name.includes(search) || nick.includes(search);
-    const matchesDiv = !div || clean(r.division) === div;
-    const matchesWt = !wt || clean(r.weight_class) === wt;
-    return matchesSearch && matchesDiv && matchesWt;
-  });
-
-  renderRoster(filtered);
+  if (empty) empty.classList.toggle("hidden", rows.length > 0);
 }
 
 /* ================= FUNDRAISERS ================= */
@@ -309,82 +285,65 @@ function renderFundraisers(rows) {
   const empty = qs("#fundraisersEmpty");
   if (!grid) return;
 
-  grid.innerHTML = "";
+  grid.innerHTML = rows
+    .map((r) => {
+      const title = cleanCell(r.title);
+      const desc = cleanCell(r.description);
+      const img = normalizeImageUrl(r.image_url);
+      const ctaLabel = cleanCell(r.cta_label);
+      const ctaUrl = cleanCell(r.cta_url);
 
-  rows.forEach((r) => {
-    const img = normalizeImageUrl(r.image_url);
+      return `
+        <div class="card">
+          ${!isBlank(img) ? `<img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(title)}" loading="lazy" style="aspect-ratio:16/9">` : ""}
+          <div class="card__body">
+            <div class="card__title">${escapeHtml(title)}</div>
+            ${!isBlank(desc) ? `<div class="card__sub" style="margin-top:10px; white-space:pre-wrap">${escapeHtml(desc)}</div>` : ""}
+            ${
+              !isBlank(ctaLabel) && !isBlank(ctaUrl)
+                ? `<div style="margin-top:12px"><a class="btn btn--primary" href="${escapeAttr(ctaUrl)}" target="_blank" rel="noopener">${escapeHtml(ctaLabel)}</a></div>`
+                : ""
+            }
+          </div>
+        </div>`;
+    })
+    .join("");
 
-    grid.innerHTML += `
-      <div class="card">
-        ${!isBlank(img) ? `<img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(r.title)}" loading="lazy" style="aspect-ratio:16/9">` : ""}
-        <div class="card__body">
-          <div class="card__title">${escapeHtml(r.title)}</div>
-          ${!isBlank(r.description) ? `<div class="card__sub" style="margin-top:10px; white-space:pre-wrap">${escapeHtml(r.description)}</div>` : ""}
-          ${
-            !isBlank(r.cta_label) && !isBlank(r.cta_url)
-              ? `<div style="margin-top:12px">
-                  <a class="btn btn--primary" href="${escapeAttr(r.cta_url)}" target="_blank" rel="noopener">${escapeHtml(r.cta_label)}</a>
-                </div>`
-              : ""
-          }
-        </div>
-      </div>`;
-  });
-
-  if (empty) (rows.length ? hide(empty) : show(empty));
+  if (empty) empty.classList.toggle("hidden", rows.length > 0);
 }
 
-/* ================= MEDAL HALL (classic cards w/ info box) ================= */
+/* ================= MEDAL HALL ================= */
 function renderMedalHall(rows) {
   const grid = qs("#medalGrid");
   const empty = qs("#medalEmpty");
   if (!grid) return;
 
-  grid.innerHTML = "";
+  const sorted = rows.slice().sort((a, b) => {
+    const da = fmtDate(a.date)?.date?.getTime() ?? 0;
+    const db = fmtDate(b.date)?.date?.getTime() ?? 0;
+    return db - da;
+  });
 
-  rows
-    .slice()
-    .sort((a, b) => (fmtDate(b.date)?.date ?? 0) - (fmtDate(a.date)?.date ?? 0))
-    .forEach((r) => {
-      const photos = getPhotoList(r);
-      const firstImg = photos[0] || "";
+  grid.innerHTML = sorted
+    .map((r) => {
+      const img = normalizeImageUrl(r.photo_url);
+      const title = cleanCell(r.wrestler_name);
+      const tourney = cleanCell(r.tournament_name);
+      const notes = cleanCell(r.notes);
 
-      // Build a simple info line (only if data exists)
-      const infoParts = [];
-      if (!isBlank(r.tournament_name)) infoParts.push(r.tournament_name);
-      if (!isBlank(r.division)) infoParts.push(r.division);
-      if (!isBlank(r.weight_class)) infoParts.push(r.weight_class);
-      const info = infoParts.join(" • ");
-
-      // If multiple photos, show the first photo, and notes will mention count
-      const extraCount = Math.max(0, photos.length - 1);
-
-      grid.innerHTML += `
+      return `
         <div class="card">
-          ${
-            !isBlank(firstImg)
-              ? `<img class="card__img" src="${escapeAttr(firstImg)}" alt="${escapeAttr(r.wrestler_name || "Medal Hall")}" loading="lazy" style="aspect-ratio:16/9">`
-              : ""
-          }
+          ${!isBlank(img) ? `<img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(title || tourney || "Medal")}" loading="lazy" style="aspect-ratio:16/9">` : ""}
           <div class="card__body">
-            <div class="card__title">${escapeHtml(r.wrestler_name || "SYWC")}</div>
-            ${!isBlank(info) ? `<div class="card__sub">${escapeHtml(info)}</div>` : ""}
-            ${
-              !isBlank(r.placement)
-                ? `<div class="card__sub" style="margin-top:6px">Placement: <b>${escapeHtml(r.placement)}</b></div>`
-                : ""
-            }
-            ${
-              extraCount
-                ? `<div class="card__sub" style="margin-top:6px">+${extraCount} more photo${extraCount === 1 ? "" : "s"}</div>`
-                : ""
-            }
-            ${!isBlank(r.notes) ? `<div class="card__sub" style="margin-top:10px; white-space:pre-wrap">${escapeHtml(r.notes)}</div>` : ""}
+            ${!isBlank(title) ? `<div class="card__title">${escapeHtml(title)}</div>` : ""}
+            ${!isBlank(tourney) ? `<div class="card__sub">${escapeHtml(tourney)}</div>` : ""}
+            ${!isBlank(notes) ? `<div class="card__sub" style="margin-top:8px; white-space:pre-wrap">${escapeHtml(notes)}</div>` : ""}
           </div>
         </div>`;
-    });
+    })
+    .join("");
 
-  if (empty) (rows.length ? hide(empty) : show(empty));
+  if (empty) empty.classList.toggle("hidden", sorted.length > 0);
 }
 
 /* ================= COACHES ================= */
@@ -393,23 +352,26 @@ function renderCoaches(rows) {
   const empty = qs("#coachesEmpty");
   if (!grid) return;
 
-  grid.innerHTML = "";
+  grid.innerHTML = rows
+    .map((r) => {
+      const name = cleanCell(r.name);
+      const role = cleanCell(r.role);
+      const img = normalizeImageUrl(r.photo_url);
+      const bio = cleanCell(r.bio);
 
-  rows.forEach((r) => {
-    const img = normalizeImageUrl(r.photo_url);
+      return `
+        <div class="card">
+          ${!isBlank(img) ? `<img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(name)}" loading="lazy" style="aspect-ratio:1/1">` : ""}
+          <div class="card__body">
+            <div class="card__title">${escapeHtml(name)}</div>
+            ${!isBlank(role) ? `<div class="card__sub">${escapeHtml(role)}</div>` : ""}
+            ${!isBlank(bio) ? `<div class="card__sub" style="margin-top:10px; white-space:pre-wrap">${escapeHtml(bio)}</div>` : ""}
+          </div>
+        </div>`;
+    })
+    .join("");
 
-    grid.innerHTML += `
-      <div class="card">
-        ${!isBlank(img) ? `<img class="card__img" src="${escapeAttr(img)}" alt="${escapeAttr(r.name)}" loading="lazy" style="aspect-ratio:1/1">` : ""}
-        <div class="card__body">
-          <div class="card__title">${escapeHtml(r.name)}</div>
-          ${!isBlank(r.role) ? `<div class="card__sub">${escapeHtml(r.role)}</div>` : ""}
-          ${!isBlank(r.bio) ? `<div class="card__sub" style="margin-top:10px; white-space:pre-wrap">${escapeHtml(r.bio)}</div>` : ""}
-        </div>
-      </div>`;
-  });
-
-  if (empty) (rows.length ? hide(empty) : show(empty));
+  if (empty) empty.classList.toggle("hidden", rows.length > 0);
 }
 
 /* ================= SPONSORS ================= */
@@ -418,41 +380,24 @@ function renderSponsors(rows) {
   const empty = qs("#sponsorsEmpty");
   if (!grid) return;
 
-  grid.innerHTML = "";
+  grid.innerHTML = rows
+    .map((r) => {
+      const name = cleanCell(r.name);
+      const level = cleanCell(r.level);
+      const logo = normalizeImageUrl(r.logo_url);
+      const url = cleanCell(r.website_url);
 
-  rows.forEach((r) => {
-    const logo = normalizeImageUrl(r.logo_url);
+      return `
+        <div class="sponsor">
+          ${!isBlank(logo) ? `<img class="sponsor__logo" src="${escapeAttr(logo)}" alt="${escapeAttr(name)}" loading="lazy">` : ""}
+          <div class="sponsor__name">${escapeHtml(name)}</div>
+          <div class="sponsor__meta">${escapeHtml(!isBlank(level) ? level : "Sponsor")}</div>
+          ${!isBlank(url) ? `<a class="btn btn--primary" href="${escapeAttr(url)}" target="_blank" rel="noopener">Visit</a>` : ""}
+        </div>`;
+    })
+    .join("");
 
-    grid.innerHTML += `
-      <div class="sponsor">
-        ${!isBlank(logo) ? `<img class="sponsor__logo" src="${escapeAttr(logo)}" alt="${escapeAttr(r.name)}" loading="lazy">` : ""}
-        <div class="sponsor__name">${escapeHtml(r.name)}</div>
-        <div class="sponsor__meta">${escapeHtml(r.level || "Sponsor")}</div>
-        ${!isBlank(r.website_url) ? `<a class="btn btn--primary" href="${escapeAttr(r.website_url)}" target="_blank" rel="noopener">Visit</a>` : ""}
-      </div>`;
-  });
-
-  if (empty) (rows.length ? hide(empty) : show(empty));
-}
-
-/* ================= MOBILE NAV TOGGLE ================= */
-function initNav() {
-  const btn = qs("#menuBtn");
-  const nav = qs("#nav");
-  if (!btn || !nav) return;
-
-  btn.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-  });
-
-  // Close nav after tapping a link (mobile)
-  qsa("#nav a").forEach((a) => {
-    a.addEventListener("click", () => {
-      nav.classList.remove("open");
-      btn.setAttribute("aria-expanded", "false");
-    });
-  });
+  if (empty) empty.classList.toggle("hidden", rows.length > 0);
 }
 
 /* ================= INIT ================= */
@@ -460,18 +405,8 @@ async function init() {
   const yearEl = qs("#year");
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-  initNav();
-
   try {
-    const [
-      announcements,
-      schedule,
-      roster,
-      fundraisers,
-      medal,
-      coaches,
-      sponsors,
-    ] = await Promise.all([
+    const [announcements, schedule, roster, fundraisers, medal, coaches, sponsors] = await Promise.all([
       loadTab(TABS.announcements),
       loadTab(TABS.schedule),
       loadTab(TABS.roster),
@@ -483,19 +418,7 @@ async function init() {
 
     renderAnnouncements(announcements);
     renderSchedule(schedule);
-
-    _rosterAll = roster;
-    buildRosterFilters(roster);
     renderRoster(roster);
-
-    // hook up roster filters
-    const searchEl = qs("#rosterSearch");
-    const divEl = qs("#divisionFilter");
-    const wtEl = qs("#weightFilter");
-    if (searchEl) searchEl.addEventListener("input", applyRosterFilters);
-    if (divEl) divEl.addEventListener("change", applyRosterFilters);
-    if (wtEl) wtEl.addEventListener("change", applyRosterFilters);
-
     renderFundraisers(fundraisers);
     renderMedalHall(medal);
     renderCoaches(coaches);
