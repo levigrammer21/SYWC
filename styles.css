@@ -227,7 +227,39 @@ a{color:inherit;text-decoration:none}
   border-color:#C8D4FF;
   box-shadow:0 10px 18px rgba(30,62,255,.08);
 }
+/* ================= MEDAL HALL HORIZONTAL SCROLL ================= */
+.hscroll{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding-bottom:10px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
 
+.hscroll::-webkit-scrollbar{
+  height:10px;
+}
+.hscroll::-webkit-scrollbar-thumb{
+  background:#DDE5FF;
+  border-radius:999px;
+}
+.hscroll::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+/* each medal card becomes a fixed-width "slide" */
+.hscroll .card{
+  flex:0 0 320px;          /* card width */
+  scroll-snap-align:start;
+}
+
+/* mobile: slightly narrower cards */
+@media (max-width: 520px){
+  .hscroll .card{
+    flex-basis: 260px;
+  }
+}
 /* ================= SCHEDULE LIST ================= */
 .list{
   display:flex;
