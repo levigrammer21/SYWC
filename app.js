@@ -208,8 +208,8 @@ function renderSchedule(rows) {
 
       const notes = cleanCell(r.notes);
       const link = cleanCell(r.link_url);
-      const btnLabel = !isBlank(r.details_label) ? cleanCell(r.details_label) : "Details";
-
+const btnLabel = cleanCell(r.details_label);
+      
       return `
         <div class="row">
           <div class="row__left">
