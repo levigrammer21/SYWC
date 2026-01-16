@@ -874,13 +874,21 @@
           const btnLabel = cleanCell(r.details_label);
 
           return `
-            <div class="row">
-              <div class="row__left">
-                <div class="dateBox">
-                  <div class="m">${escapeHtml(d?.m || "")}</div>
-                  <div class="d">${escapeHtml(d?.d || "")}</div>
-                  <div class="y">${escapeHtml(d?.y || "")}</div>
-                </div>
+            <div class="dateBox">
+  ${
+    d
+      ? `
+        <div class="m">${escapeHtml(d.m)}</div>
+        <div class="d">${escapeHtml(d.d)}</div>
+        <div class="y">${escapeHtml(d.y)}</div>
+      `
+      : `
+        <div class="d" style="font-size:14px; line-height:1.2; padding:6px 0;">
+          ${escapeHtml(cleanCell(r.date))}
+        </div>
+      `
+  }
+</div>
                 <div class="row__content">
                   <div class="row__title row__title--big">${escapeHtml(title)}</div>
                   ${meta.length ? `<div class="row__meta">${escapeHtml(meta.join(" • "))}</div>` : ""}
