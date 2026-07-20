@@ -6,7 +6,7 @@
   <meta name="description" content="Official website of Stroud Youth Wrestling Club, home of the Stroud Tigers.">
   <meta name="theme-color" content="#123fb4">
   <title>Stroud Youth Wrestling Club | Stroud Tigers</title>
-  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,16 +17,17 @@
   <header class="site-header">
     <div class="container nav-wrap">
       <a class="brand" href="#top" aria-label="Stroud Youth Wrestling home">
-        <img src="assets/logo.svg" alt="" width="62" height="62">
+        <img src="images/logo.svg" alt="" width="62" height="62">
         <span><strong>Stroud Youth</strong><small>Wrestling Club</small></span>
       </a>
       <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <nav id="site-nav" class="site-nav" aria-label="Main navigation">
         <a href="#announcements">Announcements</a>
-        <a href="#signups">Signups</a>
+        <a href="#fundraisers">Fundraisers</a>
         <a href="#schedule">Schedule</a>
-        <a href="#about">About</a>
-        <a href="#gallery">Photos</a>
+        <a href="#roster">Roster</a>
+        <a href="#coaches">Coaches</a>
+        <a href="#medal-hall">Medal Hall</a>
         <a class="nav-cta" href="#contact">Contact</a>
       </nav>
     </div>
@@ -49,7 +50,7 @@
           </div>
         </div>
         <div class="hero-mark" aria-hidden="true">
-          <div class="hero-mark-ring"><img src="assets/logo.svg" alt=""></div>
+          <div class="hero-mark-ring"><img src="images/logo.svg" alt=""></div>
           <div class="tigers-word">TIGERS</div>
         </div>
       </div>
@@ -73,13 +74,13 @@
       </div>
     </section>
 
-    <section class="section section-blue" id="signups">
+    <section class="section section-blue" id="fundraisers">
       <div class="container">
         <div class="section-heading light">
-          <div><p class="eyebrow">Get involved</p><h2>Signups & forms</h2></div>
-          <p>Registration, volunteer opportunities, apparel, camps, and event forms.</p>
+          <div><p class="eyebrow">Get involved</p><h2>Fundraisers & signups</h2></div>
+          <p>Registration links, club fundraisers, apparel, volunteer opportunities, and event forms.</p>
         </div>
-        <div class="card-grid" id="signup-list"></div>
+        <div class="card-grid" id="fundraiser-list"></div>
       </div>
     </section>
 
@@ -104,18 +105,48 @@
       </div>
     </section>
 
-    <section class="section gallery-section" id="gallery">
+    <section class="section" id="roster">
       <div class="container">
         <div class="section-heading">
-          <div><p class="eyebrow blue">Tiger moments</p><h2>Photo gallery</h2></div>
-          <p>Practices, tournaments, team events, and memories from the season.</p>
+          <div><p class="eyebrow blue">Meet the Tigers</p><h2>Team roster</h2></div>
+          <p>Wrestler information shown from the ROSTER tab.</p>
         </div>
-        <div class="gallery-grid" id="gallery-grid"></div>
-        <div class="empty-gallery" id="empty-gallery">
+        <div class="people-grid" id="roster-grid"></div>
+      </div>
+    </section>
+
+    <section class="section section-blue" id="coaches">
+      <div class="container">
+        <div class="section-heading light">
+          <div><p class="eyebrow">Leadership</p><h2>Coaching staff</h2></div>
+          <p>Meet the coaches helping our Tigers grow in wrestling and character.</p>
+        </div>
+        <div class="people-grid" id="coaches-grid"></div>
+      </div>
+    </section>
+
+    <section class="section gallery-section" id="medal-hall">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow blue">Tiger pride</p><h2>Medal hall</h2></div>
+          <p>Celebrating our wrestlers, tournament finishes, medals, and team achievements.</p>
+        </div>
+        <div class="gallery-grid" id="medal-grid"></div>
+        <div class="empty-gallery" id="empty-medals">
           <div class="camera-icon" aria-hidden="true">▣</div>
-          <h3>Team photos will appear here</h3>
-          <p>Add image files to <code>assets/images</code>, then list them in <code>content/site.json</code>.</p>
+          <h3>Medal hall entries will appear here</h3>
+          <p>Add image files to <code>images</code>, then enter the filename in the MEDAL_HALL tab of the Google Sheet.</p>
         </div>
+      </div>
+    </section>
+
+    <section class="section sponsors-section" id="sponsors">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow blue">Community partners</p><h2>Our sponsors</h2></div>
+          <p>Thank you to the businesses and organizations supporting Stroud Youth Wrestling.</p>
+        </div>
+        <div class="sponsor-grid" id="sponsor-grid"></div>
       </div>
     </section>
 
@@ -133,11 +164,12 @@
 
   <footer class="site-footer">
     <div class="container footer-layout">
-      <div class="footer-brand"><img src="assets/logo.svg" alt="" width="50" height="50"><span id="footer-note"></span></div>
+      <div class="footer-brand"><img src="images/logo.svg" alt="" width="50" height="50"><span id="footer-note"></span></div>
       <p>© <span id="year"></span> Stroud Youth Wrestling Club. All rights reserved.</p>
     </div>
   </footer>
 
+  <script src="config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
