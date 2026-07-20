@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Official website of Stroud Youth Wrestling Club, home of the Stroud Tigers.">
+  <meta name="theme-color" content="#123fb4">
+  <title>Stroud Youth Wrestling Club | Stroud Tigers</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#top" aria-label="Stroud Youth Wrestling home">
+        <img src="assets/logo.svg" alt="" width="62" height="62">
+        <span><strong>Stroud Youth</strong><small>Wrestling Club</small></span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+      <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+        <a href="#announcements">Announcements</a>
+        <a href="#signups">Signups</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#about">About</a>
+        <a href="#gallery">Photos</a>
+        <a class="nav-cta" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-grid"></div>
+      <div class="container hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow" id="hero-eyebrow"></p>
+          <h1 id="hero-headline"></h1>
+          <p class="hero-description" id="hero-description"></p>
+          <div class="hero-actions">
+            <a class="button button-primary" id="hero-primary" href="#signups"></a>
+            <a class="button button-secondary" id="hero-secondary" href="#announcements"></a>
+          </div>
+          <div class="hero-badges" aria-label="Club values">
+            <span>Discipline</span><span>Confidence</span><span>Community</span>
+          </div>
+        </div>
+        <div class="hero-mark" aria-hidden="true">
+          <div class="hero-mark-ring"><img src="assets/logo.svg" alt=""></div>
+          <div class="tigers-word">TIGERS</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quick-strip" aria-label="Club highlights">
+      <div class="container quick-grid">
+        <div><strong>All skill levels</strong><span>Beginners are welcome</span></div>
+        <div><strong>Youth focused</strong><span>Technique and character</span></div>
+        <div><strong>Stroud proud</strong><span>Representing our community</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="announcements">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow blue">Club updates</p><h2>Latest announcements</h2></div>
+          <p>Important news, deadlines, schedule changes, and tournament information.</p>
+        </div>
+        <div class="announcement-list" id="announcement-list"></div>
+      </div>
+    </section>
+
+    <section class="section section-blue" id="signups">
+      <div class="container">
+        <div class="section-heading light">
+          <div><p class="eyebrow">Get involved</p><h2>Signups & forms</h2></div>
+          <p>Registration, volunteer opportunities, apparel, camps, and event forms.</p>
+        </div>
+        <div class="card-grid" id="signup-list"></div>
+      </div>
+    </section>
+
+    <section class="section" id="schedule">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow blue">Mark your calendar</p><h2>Upcoming schedule</h2></div>
+          <p>Practices, meets, tournaments, weigh-ins, and club events.</p>
+        </div>
+        <div class="schedule-list" id="schedule-list"></div>
+      </div>
+    </section>
+
+    <section class="section about-section" id="about">
+      <div class="container about-layout">
+        <div class="about-copy">
+          <p class="eyebrow blue">Who we are</p>
+          <h2 id="about-heading"></h2>
+          <p id="about-body"></p>
+        </div>
+        <div class="values-grid" id="values-list"></div>
+      </div>
+    </section>
+
+    <section class="section gallery-section" id="gallery">
+      <div class="container">
+        <div class="section-heading">
+          <div><p class="eyebrow blue">Tiger moments</p><h2>Photo gallery</h2></div>
+          <p>Practices, tournaments, team events, and memories from the season.</p>
+        </div>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <div class="empty-gallery" id="empty-gallery">
+          <div class="camera-icon" aria-hidden="true">▣</div>
+          <h3>Team photos will appear here</h3>
+          <p>Add image files to <code>assets/images</code>, then list them in <code>content/site.json</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contact">
+      <div class="container contact-card">
+        <div>
+          <p class="eyebrow">Questions?</p>
+          <h2>Connect with Stroud Youth Wrestling</h2>
+          <p>Reach out for registration help, coaching information, sponsorship opportunities, or general club questions.</p>
+        </div>
+        <div class="contact-links" id="contact-links"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-layout">
+      <div class="footer-brand"><img src="assets/logo.svg" alt="" width="50" height="50"><span id="footer-note"></span></div>
+      <p>© <span id="year"></span> Stroud Youth Wrestling Club. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
