@@ -1,0 +1,82 @@
+{
+  "club": {
+    "name": "Stroud Youth Wrestling Club",
+    "shortName": "Stroud Youth Wrestling",
+    "teamName": "Stroud Tigers",
+    "tagline": "Building confidence, discipline, and champions—on and off the mat.",
+    "location": "Stroud, Oklahoma",
+    "email": "",
+    "phone": "",
+    "facebookUrl": "",
+    "instagramUrl": ""
+  },
+  "hero": {
+    "eyebrow": "Home of the Stroud Tigers",
+    "headline": "Strong kids. Strong character. Strong community.",
+    "description": "Stroud Youth Wrestling Club gives young athletes a positive place to learn wrestling fundamentals, build confidence, and compete as part of a team.",
+    "primaryButton": {
+      "label": "View Signups",
+      "url": "#signups"
+    },
+    "secondaryButton": {
+      "label": "Latest Announcements",
+      "url": "#announcements"
+    }
+  },
+  "announcements": [
+    {
+      "date": "2026-07-18",
+      "title": "Welcome to the new Stroud Youth Wrestling website",
+      "body": "Club announcements, registration links, schedules, and photos will be posted here throughout the season.",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": true
+    }
+  ],
+  "signups": [
+    {
+      "title": "Youth Wrestling Registration",
+      "description": "Registration details and the official signup link will be posted here when enrollment opens.",
+      "buttonLabel": "Registration details coming soon",
+      "url": "",
+      "status": "coming-soon"
+    },
+    {
+      "title": "Volunteer & Parent Help",
+      "description": "Help with events, concessions, tournaments, transportation, or club activities.",
+      "buttonLabel": "Volunteer signup coming soon",
+      "url": "",
+      "status": "coming-soon"
+    }
+  ],
+  "schedule": [
+    {
+      "date": "",
+      "time": "",
+      "title": "Season schedule will be announced here",
+      "location": "Stroud, Oklahoma",
+      "type": "Club Update"
+    }
+  ],
+  "about": {
+    "heading": "More than wrestling",
+    "body": "Our goal is to create a safe, encouraging environment where athletes can develop technique, toughness, sportsmanship, and lasting friendships. We welcome beginners and experienced wrestlers alike.",
+    "values": [
+      {
+        "title": "Discipline",
+        "text": "Learning to prepare, focus, and keep working through challenges."
+      },
+      {
+        "title": "Confidence",
+        "text": "Helping athletes believe in themselves through practice and competition."
+      },
+      {
+        "title": "Community",
+        "text": "Representing Stroud with pride and supporting every wrestler and family."
+      }
+    ]
+  },
+  "gallery": [],
+  "sponsors": [],
+  "footerNote": "Stroud Youth Wrestling Club • Home of the Stroud Tigers"
+}
