@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-labelledby="title desc">
+  <title id="title">Stroud Tigers wrestling logo</title>
+  <desc id="desc">A bold tiger paw and wrestling shield in royal blue, white and black.</desc>
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1746c7"/>
+      <stop offset="1" stop-color="#082a86"/>
+    </linearGradient>
+  </defs>
+  <path d="M110 8 200 40v62c0 54-36 91-90 110C56 193 20 156 20 102V40Z" fill="url(#blue)" stroke="#05070c" stroke-width="8"/>
+  <path d="M110 23 184 49v53c0 42-26 72-74 91-48-19-74-49-74-91V49Z" fill="none" stroke="#fff" stroke-width="5" opacity=".95"/>
+  <ellipse cx="110" cy="122" rx="34" ry="29" fill="#fff"/>
+  <ellipse cx="69" cy="82" rx="17" ry="22" transform="rotate(-24 69 82)" fill="#fff"/>
+  <ellipse cx="94" cy="68" rx="16" ry="23" transform="rotate(-8 94 68)" fill="#fff"/>
+  <ellipse cx="126" cy="68" rx="16" ry="23" transform="rotate(8 126 68)" fill="#fff"/>
+  <ellipse cx="151" cy="82" rx="17" ry="22" transform="rotate(24 151 82)" fill="#fff"/>
+  <path d="M83 121c10-16 44-16 54 0-8 19-18 31-27 31s-19-12-27-31Z" fill="#05070c"/>
+  <path d="M57 169h106" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <text x="110" y="184" text-anchor="middle" fill="#fff" font-size="20" font-family="Arial, Helvetica, sans-serif" font-weight="900" letter-spacing="2">STROUD</text>
+</svg>
