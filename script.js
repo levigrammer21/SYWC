@@ -3,12 +3,12 @@ const CONFIG = window.SYWC_CONFIG;
 
 const DEFAULT_HERO = {
   eyebrow: "Stroud, Oklahoma • Youth Wrestling",
-  headline: "Built tough. Trained right. Tiger proud.",
-  description: "Stroud Youth Wrestling Club helps young athletes build wrestling skills, confidence, discipline, and friendships that last.",
-  primaryLabel: "View fundraisers",
+  headline: "Work. Don’t wish.",
+  description: "Stroud Youth Wrestling Club helps young men and women build the confidence, discipline, and competitiveness to become champions on and off the mat.",
+  primaryLabel: "Register now",
   primaryUrl: "#fundraisers",
-  secondaryLabel: "Latest updates",
-  secondaryUrl: "#announcements"
+  secondaryLabel: "View schedule",
+  secondaryUrl: "#schedule"
 };
 
 function normalizeKey(value = "") {
@@ -174,7 +174,7 @@ function setStaticContent() {
   if (CONFIG.club.phone) contacts.push(`<a href="tel:${escapeHtml(CONFIG.club.phone.replace(/[^+\d]/g,""))}">Call or text ${escapeHtml(CONFIG.club.phone)}</a>`);
   if (safeLink(CONFIG.club.facebookUrl)) contacts.push(`<a href="${escapeHtml(CONFIG.club.facebookUrl)}" target="_blank" rel="noopener">Facebook</a>`);
   if (safeLink(CONFIG.club.instagramUrl)) contacts.push(`<a href="${escapeHtml(CONFIG.club.instagramUrl)}" target="_blank" rel="noopener">Instagram</a>`);
-  $("#contact-links").innerHTML = contacts.length ? contacts.join("") : `<div class="contact-empty">Add contact links in <code>config.js</code>.</div>`;
+  $("#contact-links").innerHTML = contacts.join("");
   $("#footer-note").textContent = "Stroud Tigers • Strong minds. Strong bodies. Strong community.";
 }
 
@@ -188,8 +188,7 @@ async function loadSite() {
   const results = await Promise.allSettled(jobs.map(async ([key, render]) => render(await loadTab(CONFIG.tabs[key]))));
   const failed = results.filter(result => result.status === "rejected");
   if (failed.length) {
-    console.error("Google Sheet loading errors:", failed);
-    $("#announcement-list").insertAdjacentHTML("afterbegin", `<div class="sheet-warning"><strong>Some website content could not load.</strong> Confirm the Google Sheet is shared as “Anyone with the link — Viewer” and that tab names match config.js.</div>`);
+    console.error("Content loading errors:", failed);
   }
 }
 

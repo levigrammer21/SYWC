@@ -24,3 +24,11 @@
 @media (max-width:600px) { .people-grid,.sponsor-grid { grid-template-columns:1fr; } }
 
 .flo-profile-link{display:inline-flex;align-items:center;margin-top:10px;color:var(--blue);font-weight:900;text-decoration:none}.flo-profile-link:hover{text-decoration:underline}.person-card-dark .flo-profile-link{color:#fff}
+
+/* Stroud Tigers logo */
+.brand>img{width:88px;height:72px;object-fit:contain;flex:0 0 auto}.hero-mark-ring img{width:86%;height:86%;object-fit:contain}.footer-brand img{width:68px;height:54px;object-fit:contain}@media(max-width:760px){.brand>img{width:82px;height:68px}.brand{gap:10px}.brand strong{font-size:1.32rem}.brand small{font-size:.8rem}.nav-wrap{min-height:92px}}
+
+/* Stroud Tigers hero watermark */
+.hero-copy{position:relative;z-index:2}
+.hero-copy::before{content:"";position:absolute;z-index:-1;width:min(560px,82vw);aspect-ratio:1;left:48%;top:48%;transform:translate(-50%,-50%);background:url("images/tiger-logo.png") center/contain no-repeat;opacity:.075;filter:grayscale(1) brightness(3);pointer-events:none}
+@media (max-width:760px){.hero-copy::before{width:110vw;left:54%;top:44%;opacity:.06}.hero-mark{display:none}}
