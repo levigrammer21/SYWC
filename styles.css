@@ -22,3 +22,5 @@
 .light-empty { color:#fff; }
 @media (max-width:900px) { .people-grid,.sponsor-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:600px) { .people-grid,.sponsor-grid { grid-template-columns:1fr; } }
+
+.flo-profile-link{display:inline-flex;align-items:center;margin-top:10px;color:var(--blue);font-weight:900;text-decoration:none}.flo-profile-link:hover{text-decoration:underline}.person-card-dark .flo-profile-link{color:#fff}

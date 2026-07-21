@@ -38,7 +38,9 @@ Use `TRUE` in `visible` to show an entry. Use `TRUE` in `pin_to_top` for an impo
 
 ### ROSTER
 
-`visible | name | grade | division | weight_class | photo | bio`
+`visible | name | flo_url | grade | division | weight_class | photo | bio`
+
+Add the wrestler's full FloWrestling profile link in `flo_url`. When the cell is blank, no profile button is shown.
 
 ### FUNDRAISERS
 

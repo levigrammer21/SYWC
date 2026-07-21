@@ -117,17 +117,18 @@ function renderFundraisers(rows) {
   }).join("") : `<p class="light-empty">No active fundraisers or signup forms.</p>`;
 }
 
-function personCard(row, dark = false) {
+function personCard(row, dark = false, showFlo = false) {
   const photo = imageUrl(first(row,"image","photo","image_url","photo_url"));
   const name = first(row,"name","wrestler","coach_name","full_name","title");
   const detail = [first(row,"grade","age_group","division","role","position"), first(row,"weight_class","weight")].filter(Boolean).join(" • ");
   const bio = first(row,"bio","description","details","achievements");
-  return `<article class="person-card ${dark ? "person-card-dark" : ""}">${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" loading="lazy">` : `<div class="person-placeholder">T</div>`}<div><h3>${escapeHtml(name)}</h3>${detail ? `<p class="person-detail">${escapeHtml(detail)}</p>` : ""}${bio ? `<p>${escapeHtml(bio)}</p>` : ""}</div></article>`;
+  const floUrl = showFlo ? safeLink(first(row,"flo_url","flo_profile","flowrestling_url")) : "";
+  return `<article class="person-card ${dark ? "person-card-dark" : ""}">${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" loading="lazy">` : `<div class="person-placeholder">T</div>`}<div><h3>${escapeHtml(name)}</h3>${detail ? `<p class="person-detail">${escapeHtml(detail)}</p>` : ""}${bio ? `<p>${escapeHtml(bio)}</p>` : ""}${floUrl ? `<a class="flo-profile-link" href="${escapeHtml(floUrl)}" target="_blank" rel="noopener">View FloWrestling profile →</a>` : ""}</div></article>`;
 }
 
-function renderPeople(rows, selector, dark = false) {
+function renderPeople(rows, selector, dark = false, showFlo = false) {
   const items = visibleRows(rows);
-  $(selector).innerHTML = items.length ? items.map(row => personCard(row,dark)).join("") : `<p>No entries have been posted yet.</p>`;
+  $(selector).innerHTML = items.length ? items.map(row => personCard(row, dark, showFlo)).join("") : `<p>No entries have been posted yet.</p>`;
 }
 
 function renderMedals(rows) {
@@ -181,7 +182,7 @@ async function loadSite() {
   setStaticContent();
   const jobs = [
     ["announcements", renderAnnouncements], ["schedule", renderSchedule], ["fundraisers", renderFundraisers],
-    ["roster", rows => renderPeople(rows,"#roster-grid")], ["coaches", rows => renderPeople(rows,"#coaches-grid",true)],
+    ["roster", rows => renderPeople(rows,"#roster-grid",false,true)], ["coaches", rows => renderPeople(rows,"#coaches-grid",true,false)],
     ["medalHall", renderMedals], ["sponsors", renderSponsors]
   ];
   const results = await Promise.allSettled(jobs.map(async ([key, render]) => render(await loadTab(CONFIG.tabs[key]))));
