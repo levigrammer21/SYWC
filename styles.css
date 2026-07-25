@@ -30,5 +30,5 @@
 
 /* Stroud Tigers hero watermark */
 .hero-copy{position:relative;z-index:2}
-.hero-copy::before{content:"";position:absolute;z-index:-1;width:min(560px,82vw);aspect-ratio:1;left:48%;top:48%;transform:translate(-50%,-50%);background:url("images/tiger-logo.png") center/contain no-repeat;opacity:.075;filter:grayscale(1) brightness(3);pointer-events:none}
+.hero-copy::before{content:"";position:absolute;z-index:-1;width:min(560px,82vw);aspect-ratio:1;left:48%;top:48%;transform:translate(-50%,-50%);background:url("images/tiger-logo.png?v=2") center/contain no-repeat;opacity:.075;filter:grayscale(1) brightness(3);pointer-events:none}
 @media (max-width:760px){.hero-copy::before{width:110vw;left:54%;top:44%;opacity:.06}.hero-mark{display:none}}
