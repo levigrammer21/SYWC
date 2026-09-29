@@ -1,105 +1,76 @@
-# Stroud Youth Wrestling Club Website
+# Stroud Youth Wrestling — Colosseum overhaul
 
-This GitHub Pages website uses the Google Sheet below as its content-management system:
+## Publish
 
-`https://docs.google.com/spreadsheets/d/1dPPX4OQeafjlVBu1pRi-n98hTCbM0BsQRFQJbEcCEUw/edit`
+Upload the contents of this ZIP to your existing GitHub repository root, replacing matching files. Keep the `images` folder intact. The ZIP contains a complete website, not a patch. GitHub Pages and the existing `CNAME` (`stroudyouthwrestling.com`) remain supported. No build, installation, or API key is needed.
 
-The website design stays in the repository. Announcements, schedule entries, roster members, fundraisers/signups, medal hall entries, coaches, and sponsors are managed from Google Sheets.
+Open the deployed site after GitHub Pages finishes publishing. If your browser shows the previous design, refresh it. To preview locally, run `python3 -m http.server 8000` in this folder and open http://localhost:8000.
 
-## Required Google Sheet sharing setting
+## Google Sheet
 
-Open the sheet and select **Share → General access → Anyone with the link → Viewer**. The website only reads the sheet; visitors cannot edit it.
+https://docs.google.com/spreadsheets/d/1dPPX4OQeafjlVBu1pRi-n98hTCbM0BsQRFQJbEcCEUw/edit
 
-The tab names must remain:
+The existing sheet remains the content source. Existing club rows were preserved. Four tournament tabs have been added directly to that sheet. Keep its existing public viewer access so the site can read it. Sheet edits appear on a page reload (Google may briefly cache its response).
 
-- `ANNOUNCEMENTS`
-- `SCHEDULE`
-- `ROSTER`
-- `FUNDRAISERS`
-- `MEDAL_HALL`
-- `COACHES`
-- `Sponsors`
+### Wrestler profiles
 
-Tab names can be changed in `config.js` when necessary.
+In `ROSTER`, paste each full FloWrestling profile URL into column C, `flo_url`. That column already existed and has been retained. A wrestler with a link gets a fully clickable card that opens their profile in a new tab. A blank link gives a normal, non-clickable card. Names, divisions, photos, and bios continue to come from the sheet. The new search and division filter use this same roster.
 
-## Recommended columns
+### Tournament settings — TOURNAMENT
 
-Column names are case-insensitive. Spaces and underscores are treated the same.
+Edit the `value` column beside each key. Keep the keys unchanged.
 
-### ANNOUNCEMENTS
+- `name`: Gladiators in the Colosseum
+- `date`: 2027-01-23, in YYYY-MM-DD format
+- `start_time`: blank until confirmed; enter Central time in 24-hour format, e.g. `09:00`. Format as plain text if Sheets tries to convert it.
+- `venue`: Stroud Route 66 Colosseum
+- `address`: full venue address, optional
+- `registration_url`: full https:// entry link, optional
+- `registration_label`: registration button wording
+- `details`: entry fees, weigh-ins, check-in instructions, or other event information
 
-`visible | date | title | message | pin_to_top | cta_label | cta_url`
+The seconds countdown appears above the venue photograph on the homepage and on the arena page. With no start time, it explicitly counts down to midnight Central at the beginning of January 23. Once a start time is entered, it counts down to that time. Central time is used for every visitor, including visitors in other time zones. It stops at zero and shows “Tournament date reached.”
 
-Use `TRUE` in `visible` to show an entry. Use `TRUE` in `pin_to_top` for an important announcement.
+The arena's Add to calendar action uses the current sheet settings; while time is unknown, it downloads an all-day event. The bundled tournament.ics is the original date-only fallback.
 
-### SCHEDULE
+### Divisions — TOURNAMENT_DIVISIONS
 
-`visible | date | time | title | type | location`
+Columns: `visible | age_group | division | weight_classes | notes`
 
-### ROSTER
+Use one row per division. Check `visible` to publish it. Enter the official age group, category (such as an actual beginner/open/girls category if applicable), and comma-separated weight classes. Put pounds or other units in the weight labels exactly as you want them displayed. This sheet starts empty because official divisions and weights have not been supplied. The site shows “Divisions are being finalized.” Do not treat examples in these instructions as tournament rules.
 
-`visible | name | flo_url | grade | division | weight_class | photo | bio`
+### Tournament sponsors — TOURNAMENT_SPONSORS
 
-Add the wrestler's full FloWrestling profile link in `flo_url`. When the cell is blank, no profile button is shown.
+Columns: `visible | name | logo | website | tier`
 
-### FUNDRAISERS
+Check `visible` to publish each sponsor. Optional tier text is displayed under the sponsor. These event sponsors are independent of the existing `Sponsors` tab, which continues to control club sponsors on the homepage.
 
-`visible | title | description | status | button_label | url`
+### Past winners — TOURNAMENT_WINNERS
 
-This tab can also hold registration forms, volunteer forms, apparel links, or any other signup. URLs can point to Google Forms, SignUpGenius, payment pages, or other websites.
+Columns: `visible | year | name | age_group | weight_class | placement | photo | flo_url`
 
-### MEDAL_HALL
+Check `visible` to publish a result after the event. Leave empty until results are available. No winners or results have been invented.
 
-`visible | wrestler | placement | tournament | date | image`
+### Existing club tabs
 
-### COACHES
+- ANNOUNCEMENTS: `visible | date | title | message | pin_to_top | cta_label | cta_url`
+- SCHEDULE: `visible | date | time | title | type | location`
+- ROSTER: `visible | name | flo_url | grade | division | weight_class | photo | bio`
+- FUNDRAISERS: `visible | title | description | status | button_label | url`
+- MEDAL_HALL: `visible | wrestler | placement | tournament | date | image`
+- COACHES: `visible | name | role | photo | bio`
+- Sponsors: `visible | name | logo | website`
 
-`visible | name | role | photo | bio`
+FALSE hides an existing club row; TRUE shows it. For backward compatibility, an empty visible cell on an otherwise populated existing row also shows it. The new tournament tabs use visible checkboxes: check the box to publish. Headers are case-insensitive, but keep tab names unchanged unless updating config.js.
 
-### Sponsors
+## Images and links
 
-`visible | name | logo | website`
+Put local photos/logos in `images/` and enter their filenames in the sheet. Full public HTTPS image URLs also work. Google Drive image links require public image access. The venue photograph is included as `images/colosseum.webp`. The original tiger artwork is retained. Full HTTP(S) links are required for FloWrestling profiles and tournament registration.
 
-## Images
+## Pages
 
-The only folder in the repository is `images/`.
+- index.html: club home, tournament feature, news, signups, searchable roster, schedule, coaches, medal hall, and club sponsors.
+- arena.html: tournament countdown, divisions/weights, details, registration when supplied, directions, calendar download, sponsors, and past winners.
+- config.js: sheet connection and optional club contacts.
 
-Upload local images into that folder and put just the filename in the sheet, for example:
-
-`john-smith.jpg`
-
-The website automatically reads that as `images/john-smith.jpg`.
-
-You can also paste a full public image URL or a shared Google Drive image link into an image/photo/logo cell. For the most reliable and fastest site, local compressed JPG or WebP files are recommended.
-
-## Root-level repository structure
-
-```text
-.nojekyll
-CNAME
-README.md
-config.js
-index.html
-script.js
-styles.css
-images/
-  logo.svg
-  your-photos.jpg
-```
-
-No other folders are required.
-
-## Publish on GitHub Pages
-
-1. Upload these files to the root of the GitHub repository.
-2. Open **Settings → Pages**.
-3. Select **Deploy from a branch**.
-4. Choose `main` and `/ (root)`.
-5. Set the custom domain to `stroudyouthwrestling.com`.
-6. Enable **Enforce HTTPS** after GitHub provisions the certificate.
-
-The included `CNAME` file already contains `stroudyouthwrestling.com`.
-
-## Configuration
-
-`config.js` contains the spreadsheet ID, tab names, and club contact/social links. It is a root-level file and normally needs editing only when changing the spreadsheet or contact information.
+The site includes a mobile menu, keyboard focus styling, reduced-motion support, missing-image fallbacks, and per-section Retry controls if a sheet request fails.

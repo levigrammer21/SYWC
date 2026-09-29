@@ -8,7 +8,11 @@ window.SYWC_CONFIG = {
     fundraisers: "FUNDRAISERS",
     medalHall: "MEDAL_HALL",
     coaches: "COACHES",
-    sponsors: "Sponsors"
+    sponsors: "Sponsors",
+    tournament: "TOURNAMENT",
+    divisions: "TOURNAMENT_DIVISIONS",
+    tournamentSponsors: "TOURNAMENT_SPONSORS",
+    winners: "TOURNAMENT_WINNERS"
   },
   club: {
     name: "Stroud Youth Wrestling Club",
