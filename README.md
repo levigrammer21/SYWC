@@ -20,7 +20,7 @@ In `ROSTER`, paste each full FloWrestling profile URL into column C, `flo_url`. 
 
 Edit the `value` column beside each key. Keep the keys unchanged.
 
-- `name`: Gladiators in the Colosseum
+- `name`: Gladiators at the Colosseum
 - `date`: 2027-01-23, in YYYY-MM-DD format
 - `start_time`: blank until confirmed; enter Central time in 24-hour format, e.g. `09:00`. Format as plain text if Sheets tries to convert it.
 - `venue`: Stroud Route 66 Colosseum

@@ -168,7 +168,7 @@ function filterRoster() {
   $('#roster-count').textContent = `${rows.length} ${rows.length===1?'wrestler':'wrestlers'}`;
   $('#roster-grid').innerHTML = rows.length ? rows.map(row=>personCard(row,false,true)).join('') : emptyState(roster.length ? 'No matching wrestlers' : 'The team roster is on its way',roster.length ? 'Try a different name or choose all divisions.' : 'Athlete profiles will appear here as the roster is updated.');
 }
-let eventSettings = {name:'Gladiators in the Colosseum', date:'2027-01-23',start_time:'',venue:'Stroud Route 66 Colosseum'};
+let eventSettings = {name:'Gladiators at the Colosseum', date:'2027-01-23',start_time:'',venue:'Stroud Route 66 Colosseum'};
 let targetTime = Date.parse('2027-01-23T00:00:00-06:00');
 // Convert a Central wall-clock time to an instant, including Central daylight-saving changes.
 function centralTime(date, time='00:00') {
@@ -208,13 +208,13 @@ function applyTournament(rows) {
   const startLabel=time?new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(new Date(targetTime)):'Start time to be announced';
   document.querySelectorAll('.countdown-note').forEach(el=>el.textContent=time?`${fullDate} · ${startLabel}`:`Start time to be announced. Countdown targets ${fullDate} at midnight Central.`);
   document.querySelectorAll('.countdown').forEach(el=>el.setAttribute('aria-label',`Countdown to ${fullDate}${time?' at '+startLabel:''}`));
-  const title=merged.name||'Gladiators in the Colosseum';
+  const title=merged.name||'Gladiators at the Colosseum';
   if(document.body.dataset.page==='arena') {
     document.title=title+' | Stroud Youth Wrestling';
-    if(title!=='Gladiators in the Colosseum')$('.arena-hero h1').textContent=title.toUpperCase();
+    if(title!=='Gladiators at the Colosseum')$('.arena-hero h1').textContent=title.toUpperCase();
     $('.arena-closing p').innerHTML=escapeHtml(title.toUpperCase())+'<br><span>'+escapeHtml(fullDate.toUpperCase())+' · STROUD, OKLAHOMA</span>';
   } else {
-    if(title!=='Gladiators in the Colosseum')$('#tournament h2').textContent=title.toUpperCase();
+    if(title!=='Gladiators at the Colosseum')$('#tournament h2').textContent=title.toUpperCase();
     $('#tournament .section-heading>p').textContent='Our first tournament. '+fullDate+'. '+(merged.venue||'Stroud Route 66 Colosseum')+'.';
   }
   if($('#event-date')) {
@@ -249,7 +249,7 @@ function renderDivisions(rows){
 }
 function renderWinners(rows){
  const items=visibleRows(rows).filter(row=>first(row,'name','wrestler'));
- $('#winner-list').innerHTML=items.length?items.map(row=>personCard({...row,bio:[first(row,'year'),first(row,'placement')].filter(Boolean).join(' · ')},false,true)).join(''):emptyState('No past winners yet.','This is our inaugural tournament. Winners will be added after Gladiators in the Colosseum on January 23, 2027.');
+ $('#winner-list').innerHTML=items.length?items.map(row=>personCard({...row,bio:[first(row,'year'),first(row,'placement')].filter(Boolean).join(' · ')},false,true)).join(''):emptyState('No past winners yet.','This is our inaugural tournament. Winners will be added after Gladiators at the Colosseum on January 23, 2027.');
 }
 const homeJobs=[['announcements',renderAnnouncements,'#announcement-list'],['fundraisers',renderFundraisers,'#fundraiser-list'],['roster',renderRoster,'#roster-grid'],['schedule',renderSchedule,'#schedule-list'],['coaches',rows=>renderPeople(rows,'#coaches-grid'),'#coaches-grid'],['medalHall',renderMedals,'#medal-grid'],['sponsors',rows=>renderSponsors(rows,'#sponsor-grid','Club sponsors will be posted here.'),'#sponsor-grid']];
 const arenaJobs=[['divisions',renderDivisions,'#division-list'],['tournamentSponsors',rows=>renderSponsors(rows,'#tournament-sponsor-grid'),'#tournament-sponsor-grid'],['winners',renderWinners,'#winner-list']];
