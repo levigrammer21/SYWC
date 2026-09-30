@@ -154,6 +154,18 @@ function emptyState(title, body) {
   return `<div class="empty-state"><span class="empty-mark" aria-hidden="true">—</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(body)}</p></div>`;
 }
 let roster = [];
+let rosterExpanded = false;
+function rosterRow(row) {
+  const name = first(row,'name','wrestler','full_name');
+  const photo = imageUrl(first(row,'image','photo','image_url','photo_url'));
+  const link = webLink(first(row,'flo_url','flo_profile','flowrestling_url'));
+  const detail = [first(row,'division','age_group','grade'),first(row,'weight_class','weight')].filter(Boolean).join(' · ');
+  const wins = first(row,'wins'), losses = first(row,'losses');
+  const valid = value => /^\d+$/.test(value) && Number.isSafeInteger(Number(value));
+  const record = valid(wins) && valid(losses) ? `${Number(wins)}–${Number(losses)}` : '—';
+  const tag = link ? 'a' : 'article';
+  return `<${tag} class="roster-row" ${link ? `href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(name)} — FloWrestling profile (opens new tab)"` : ''}><img class="roster-photo ${photo?'':'roster-logo'}" src="${escapeHtml(photo||'images/tiger-logo.png')}" alt="" loading="lazy"><div class="roster-name"><h3>${escapeHtml(name)}</h3>${detail?`<p>${escapeHtml(detail)}</p>`:''}<span class="roster-profile">${link?'FloWrestling ↗':'Profile coming soon'}</span></div><div class="roster-record" aria-label="${record==='—'?'Season record not entered':`${Number(wins)} wins, ${Number(losses)} losses this season`}"><strong>${record}</strong><span>Season W–L</span></div></${tag}>`;
+}
 function renderRoster(rows) {
   roster = visibleRows(rows).filter(row => first(row, 'name','wrestler','full_name'));
   const select = $('#roster-division');
@@ -165,8 +177,14 @@ function filterRoster() {
   const query = $('#roster-search').value.toLowerCase().trim();
   const division = $('#roster-division').value;
   const rows = roster.filter(row => first(row,'name','wrestler','full_name').toLowerCase().includes(query) && (!division || first(row,'division','age_group')===division));
-  $('#roster-count').textContent = `${rows.length} ${rows.length===1?'wrestler':'wrestlers'}`;
-  $('#roster-grid').innerHTML = rows.length ? rows.map(row=>personCard(row,false,true)).join('') : emptyState(roster.length ? 'No matching wrestlers' : 'The team roster is on its way',roster.length ? 'Try a different name or choose all divisions.' : 'Athlete profiles will appear here as the roster is updated.');
+  const filtered = Boolean(query || division);
+  const shown = rosterExpanded || filtered ? rows : rows.slice(0,6);
+  $('#roster-count').textContent = rows.length ? `Showing ${shown.length} of ${rows.length} ${rows.length===1?'wrestler':'wrestlers'}` : '0 wrestlers';
+  $('#roster-grid').innerHTML = shown.length ? shown.map(rosterRow).join('') : emptyState(roster.length ? 'No matching wrestlers' : 'The team roster is on its way',roster.length ? 'Try a different name or choose all divisions.' : 'Athlete profiles will appear here as the roster is updated.');
+  const toggle = $('#roster-toggle');
+  toggle.hidden = filtered || rows.length <= 6;
+  toggle.textContent = rosterExpanded ? 'Show fewer wrestlers ↑' : `Show full roster (${rows.length}) ↓`;
+  toggle.setAttribute('aria-expanded',String(rosterExpanded));
 }
 let eventSettings = {name:'Gladiators at the Colosseum', date:'2027-01-23',start_time:'',venue:'Stroud Route 66 Colosseum'};
 let targetTime = Date.parse('2027-01-23T00:00:00-06:00');
@@ -271,9 +289,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();}});
 document.addEventListener('click',e=>{if(!e.target.closest('.site-header'))closeMenu();});
 document.addEventListener('error',event=>{
  const img=event.target;if(img.tagName!=='IMG'||img.dataset.failed)return;img.dataset.failed='true';
+ if(img.classList.contains('roster-photo')){img.src='images/tiger-logo.png';img.classList.add('roster-logo');return;}
  if(img.closest('.person-card')&&!img.closest('.person-placeholder')){const placeholder=document.createElement('div');placeholder.className='person-placeholder';placeholder.setAttribute('aria-hidden','true');placeholder.innerHTML='<img src="images/tiger-logo.png" alt="">';img.replaceWith(placeholder);}else if(!img.src.includes('tiger-logo.png'))img.classList.add('image-failed');
 },true);
 if(document.body.dataset.page==='home'){
+ $('#roster-toggle').addEventListener('click',()=>{rosterExpanded=!rosterExpanded;filterRoster();if(!rosterExpanded)$('#roster-toggle').scrollIntoView({block:'nearest'});});
  $('#roster-search').addEventListener('input',filterRoster);$('#roster-division').addEventListener('change',filterRoster);
  const links=[];if(CONFIG.club.email)links.push(`<a href="mailto:${escapeHtml(CONFIG.club.email)}">Email the club ↗</a>`);
  if(webLink(CONFIG.club.facebookUrl))links.push(`<a href="${escapeHtml(webLink(CONFIG.club.facebookUrl))}" target="_blank" rel="noopener">Facebook ↗</a>`);

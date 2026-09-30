@@ -74,3 +74,9 @@ Put local photos/logos in `images/` and enter their filenames in the sheet. Full
 - config.js: sheet connection and optional club contacts.
 
 The site includes a mobile menu, keyboard focus styling, reduced-motion support, missing-image fallbacks, and per-section Retry controls if a sheet request fails.
+
+## Compact roster and manual season records
+
+The homepage initially shows six compact wrestler rows. Show full roster / Show fewer expands or collapses the list. Searching or selecting a division shows all matching wrestlers, including those outside the first six. Each linked row still opens FloWrestling. Coach and tournament-winner cards are unchanged.
+
+In ROSTER, column I (`wins`) and column J (`losses`) hold the current season totals. Update both manually with whole numbers of 0 or greater. For example, wins 12 and losses 3 displays 12–3 with a Season W–L label. Enter 0 in both for 0–0. Blank or incomplete records display a dash; no results are assumed. At the beginning of a new season, reset the two totals manually. Existing roster information remains intact; bios remain stored in the sheet but are omitted from compact rows.
